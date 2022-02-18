@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  demo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - "3000:3000"
+    volumes: 
+      - .:/app
+    command: /app/build/app
+
+  test:
+    build: .
+    volumes: 
+      - .:/app
+    environment: { TEST }
+    command: make test
+
+  bash:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+      - .:/app
+    entrypoint: bash

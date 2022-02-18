@@ -1,0 +1,10 @@
+-std=gnu2x
+-fno-common
+-I/usr/local/include
+-fblocks
+-Wall
+-Wextra
+-Wformat
+-Wshadow
+-Wdouble-promotion
+-Wmisleading-indentation
