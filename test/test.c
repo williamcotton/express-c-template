@@ -1,12 +1,10 @@
-#include "tape.h"
-#include "test-harness.h"
-#include "test-helpers.h"
 #include <Block.h>
 #include <dotenv-c/dotenv.h>
 #include <express.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string/string.h>
+#include <tape/tape.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wshadow"
@@ -15,21 +13,40 @@
 
 void expressTests(tape_t *t);
 
+app_t *initApp(const char *databaseUrl, int databasePoolSize);
+
+test_harness_t *testHarnessFactory() {
+  const char *databaseUrl = getenv("TEST_DATABASE_URL");
+
+  __block app_t *app = initApp(databaseUrl, 5);
+  int port = 3032;
+
+  test_harness_t *testHarness = malloc(sizeof(test_harness_t));
+
+  testHarness->teardown = Block_copy(^{
+    shutdownAndFreeApp(app);
+  });
+
+  testHarness->setup = Block_copy(^(void (^callback)()) {
+    app->listen(port, ^{
+      callback();
+    });
+  });
+
+  return testHarness;
+}
+
 void runTests(int runAndExit, test_harness_t *testHarness) {
   tape_t *test = tape();
 
   int testStatus = test->test("express", ^(tape_t *t) {
-    clearState();
+    t->clearState();
 
     t->test("front page", ^(tape_t *t) {
-      char *frontPage = curlGet("/");
-      string_t *frontPageString = string(frontPage);
-      t->ok("text", frontPageString->indexOf("express-c") != -1);
-      free(frontPage);
-      frontPageString->free();
+      t->ok("text", t->get("/")->contains("express-c"));
     });
 
-    t->strEqual("healthz", curlGet("/healthz"), "OK");
+    t->strEqual("healthz", t->get("/healthz"), "OK");
   });
 
   Block_release(test->test);
