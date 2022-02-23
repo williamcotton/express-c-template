@@ -1,6 +1,6 @@
 #include <cJSON/cJSON.h>
 #include <express.h>
-#include <middleware/mustache-middleware.h>
+#include <middleware/cjson-mustache-middleware.h>
 #include <middleware/postgres-middleware.h>
 #include <stdlib.h>
 
@@ -18,7 +18,7 @@ app_t *initApp(const char *databaseUrl, int databasePoolSize) {
   app->use(expressStatic("public", staticFilesPath, embeddedFiles));
 
   /* Mustache middleware */
-  app->use(mustacheMiddleware("app/views", embeddedFiles));
+  app->use(cJSONMustacheMiddleware("app/views", embeddedFiles));
 
   /* Postgres middleware */
   postgres_connection_t *postgres =
@@ -53,7 +53,7 @@ app_t *initApp(const char *databaseUrl, int databasePoolSize) {
   /* Clean up */
   app->cleanup(Block_copy(^{
     free(staticFilesPath);
-    freePostgresConnection(postgres);
+    postgres->free();
   }));
 
   return app;
