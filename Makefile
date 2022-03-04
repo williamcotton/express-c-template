@@ -117,7 +117,7 @@ endif
 
 test-leaks: build-test-trace test-database-create
 ifeq ($(PLATFORM),LINUX)
-	valgrind --tool=memcheck --leak-check=full --suppressions=test/app.supp --gen-suppressions=all --error-exitcode=1 --num-callers=30 -s $(BUILD_DIR)/test
+	valgrind --tool=memcheck --leak-check=full --suppressions=/usr/local/share/express.supp --suppressions=test/app.supp --gen-suppressions=all --error-exitcode=1 --num-callers=30 -s $(BUILD_DIR)/test
 else ifeq ($(PLATFORM),DARWIN)
 	leaks --atExit -- $(BUILD_DIR)/test
 endif
