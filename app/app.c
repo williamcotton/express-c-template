@@ -13,6 +13,8 @@ embedded_files_data_t embeddedFiles = {0};
 app_t *initApp(const char *databaseUrl, int databasePoolSize) {
   app_t *app = express();
 
+  app->use(expressHelpersMiddleware());
+
   /* Load static files */
   char *staticFilesPath = cwdFullPath("public");
   app->use(expressStatic("public", staticFilesPath, embeddedFiles));
@@ -27,11 +29,13 @@ app_t *initApp(const char *databaseUrl, int databasePoolSize) {
 
   /* Health check */
   app->get("/healthz", ^(UNUSED request_t *req, response_t *res) {
+    debug("GET /healthz");
     res->send("OK");
   });
 
   /* Front page */
   app->get("/", ^(UNUSED request_t *req, response_t *res) {
+    debug("GET /");
     /* Query the database */
     pg_t *pg = req->m("pg");
     PGresult *pgres =

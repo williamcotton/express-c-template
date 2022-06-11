@@ -10,7 +10,7 @@ int main() {
 
   /* Environment variables */
   char *PORT = getenv("PORT");
-  int port = PORT ? atoi(PORT) : 3000;
+  int port = PORT ? atoi(PORT) : 8080;
   char *DATABASE_URL = getenv("DATABASE_URL");
   char *DATABASE_POOL_SIZE = getenv("DATABASE_POOL_SIZE");
   int databasePoolSize = DATABASE_POOL_SIZE ? atoi(DATABASE_POOL_SIZE) : 5;

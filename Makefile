@@ -147,9 +147,7 @@ $(TARGET)-analyze:
 
 .PHONY: app/embeddedFiles.h
 app/embeddedFiles.h:
-	ls app/public/* | xargs -I % xxd -i % > $@
-	ls app/views/* | xargs -I % xxd -i % >> $@
-	embed.sh $@ >> $@
+	embed.sh $@ public/* app/views/* >> $@
 
 .env:
 	cp default.env .env
