@@ -29,6 +29,7 @@ int main() {
   });
   dispatch_resume(sig_src);
 
+  /* Start the server event loop */
   app->listen(port, ^{
     printf("express-c app listening at http://localhost:%d\n", port);
     writePid("server.pid");

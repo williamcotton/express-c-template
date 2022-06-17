@@ -38,6 +38,7 @@ app_t *initApp(const char *databaseUrl, int databasePoolSize) {
     debug("GET /");
     /* Query the database */
     pg_t *pg = req->m("pg");
+    check(pg, "No Postgres connection");
     PGresult *pgres =
         pg->exec("SELECT CONCAT($1::varchar, $2::varchar, $3::varchar)",
                  "express", "-", "c");
@@ -52,6 +53,8 @@ app_t *initApp(const char *databaseUrl, int databasePoolSize) {
 
     /* Clean up */
     PQclear(pgres);
+  error:
+    res->send("Error");
   });
 
   /* Clean up */

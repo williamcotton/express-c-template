@@ -23,18 +23,16 @@ TARGET = app
 CFLAGS = $(shell cat compile_flags.txt | tr '\n' ' ')
 CFLAGS += -DBUILD_ENV=$(BUILD_ENV) -lcurl $(shell pkg-config --libs libpq) -I$(shell pg_config --includedir) -I/usr/local/include -L/usr/local/lib -lexpress
 DEV_CFLAGS = -g -O0
-TEST_CFLAGS = -Werror
+TEST_CFLAGS = -Werror -ltape
 SRC = $(filter-out app/main.c, $(wildcard app/*.c))
 TEST_SRC = $(filter-out test/test.c, $(wildcard test/*.c)) $(wildcard test/*/*.c)
 BUILD_DIR = build
+PROD_CFLAGS = -Ofast
 
 ifeq ($(PLATFORM),LINUX)
 	CFLAGS += -lm -lBlocksRuntime -ldispatch -lbsd -luuid -lpthread
-	TEST_CFLAGS += -Wl,--wrap=stat -Wl,--wrap=regcomp -Wl,--wrap=accept -Wl,--wrap=socket -Wl,--wrap=epoll_ctl, -Wl,--wrap=listen
-	PROD_CFLAGS = -Ofast
 else ifeq ($(PLATFORM),DARWIN)
 	DEV_CFLAGS += -fsanitize=address,undefined,implicit-conversion,float-divide-by-zero,local-bounds,nullability
-	PROD_CFLAGS = -Ofast
 endif
 
 all: $(TARGET)
@@ -56,6 +54,9 @@ test: test-database-create
 
 test-database-create:
 	-dbmate -e TEST_DATABASE_URL create
+
+database-create:
+	-dbmate -e DATABASE_URL create
 
 test-coverage-output:
 	mkdir -p $(BUILD_DIR)
@@ -121,6 +122,9 @@ ifeq ($(PLATFORM),LINUX)
 else ifeq ($(PLATFORM),DARWIN)
 	leaks --atExit -- $(BUILD_DIR)/test
 endif
+
+test-analyze:
+	clang --analyze $(SRC) $(shell cat compile_flags.txt | tr '\n' ' ') -I$(shell pg_config --includedir) -Xanalyzer -analyzer-output=text -Xanalyzer -analyzer-checker=core,deadcode,nullability,optin,osx,security,unix,valist -Xanalyzer -analyzer-disable-checker -Xanalyzer security.insecureAPI.DeprecatedOrUnsafeBufferHandling
 
 test-threads:
 	mkdir -p $(BUILD_DIR)
