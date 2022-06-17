@@ -13,6 +13,9 @@ embedded_files_data_t embeddedFiles = {0};
 app_t *initApp(const char *databaseUrl, int databasePoolSize) {
   app_t *app = express();
 
+  app->server->threadCount = 128;
+  app->server->maxEvents = 2;
+
   app->use(expressHelpersMiddleware());
 
   /* Load static files */
