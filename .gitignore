@@ -8,3 +8,4 @@ valgrind-suppressions.log
 test/test-cookies.txt
 server.pid
 app/embeddedFiles.h
+*.log

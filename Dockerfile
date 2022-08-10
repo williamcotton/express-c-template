@@ -1,5 +1,5 @@
 # Start with the express-c development image
-FROM ghcr.io/williamcotton/express-c:models-and-resources AS buildstage
+FROM ghcr.io/williamcotton/express-c:master AS buildstage
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
@@ -15,7 +15,7 @@ RUN ldd /app/build/app | tr -s '[:blank:]' '\n' | grep '^/' | \
   xargs -I % sh -c 'mkdir -p $(dirname sdeps%); cp % sdeps%;'
 
 # Grab a fresh copy of our linux image
-FROM ubuntu:hirsute AS deploystage
+FROM ubuntu:jammy AS deploystage
 
 WORKDIR /app
 
