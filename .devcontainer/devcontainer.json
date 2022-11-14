@@ -8,7 +8,6 @@
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"C_Cpp.updateChannel": "Insiders",
-		"C_Cpp.errorSquiggles": "Disabled",
 		"C_Cpp.codeAnalysis.clangTidy.enabled": true,
 		"sqltools.connections": [
 			{
@@ -42,9 +41,9 @@
 		5432
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
+	"postCreateCommand": "ln -ns $(which code) /usr/local/bin/code & make .env & make database-create",
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode",
+	// "remoteUser": "vscode",
 	"features": {
 		"git": "latest",
 		"github-cli": "latest"
